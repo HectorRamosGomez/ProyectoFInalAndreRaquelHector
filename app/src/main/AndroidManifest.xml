@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProyectoFinalDAM">
         <activity
-            android:name=".login.MainActivity"
+            android:name="com.example.proyectofinaldam.login.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,6 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".login.MainActivity2Idiomas" android:exported="false" />
+        <activity android:name=".login.pagina_principal.MainAplicacion" android:exported="false" />
     </application>
 
 </manifest>
