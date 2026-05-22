@@ -14,11 +14,11 @@
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:src="@android:drawable/ic_menu_sort_by_size"
-        android:tint="#1A1A1A"
         android:contentDescription="Menú"
         app:layout_constraintBottom_toBottomOf="@id/txtTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/txtTitle"/>
+        app:layout_constraintTop_toTopOf="@id/txtTitle"
+        app:tint="#1A1A1A" />
 
     <TextView
         android:id="@+id/txtTitle"
@@ -39,7 +39,6 @@
         android:layout_height="40dp"
         android:src="@drawable/logo_bueno"
         android:contentDescription="Perfil"
-        app:shapeAppearanceOverlay="@style/Widget.MaterialComponents.Circular"
         app:layout_constraintBottom_toBottomOf="@id/txtTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/txtTitle"/>
@@ -74,8 +73,7 @@
                 android:layout_height="wrap_content"
                 android:text="Total disponible"
                 android:textColor="#757575"
-                android:textSize="14sp"
-                android:textStyle="medium"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:id="@+id/txtMontoTotal"
@@ -112,8 +110,7 @@
                 android:layout_height="wrap_content"
                 android:text="Medias mensuales"
                 android:textColor="#757575"
-                android:textSize="14sp"
-                android:textStyle="medium"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:layout_width="wrap_content"
