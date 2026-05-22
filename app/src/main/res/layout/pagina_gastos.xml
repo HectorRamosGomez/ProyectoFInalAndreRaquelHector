@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".PaginaGastosActivity">
+
+    <!-- Botón de Menú (Con más margen arriba para bajarlo) -->
+    <ImageView
+        android:id="@+id/btnMenu"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="28dp"
+        android:src="@android:drawable/ic_menu_sort_by_size"
+        android:contentDescription="Menú" />
+
+    <!-- Título OnlySave (Más grande y más abajo) -->
+    <TextView
+        android:id="@+id/txtTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:text="OnlySave"
+        android:textColor="#000000"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
+    <!-- Perfil (Con más margen arriba para equilibrarlo) -->
+    <ImageView
+        android:id="@+id/btnProfile"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="24dp"
+        android:src="@android:drawable/sym_def_app_icon"
+        android:contentDescription="Perfil de usuario" />
+
+    <!-- Campo para la descripción del gasto -->
+    <EditText
+        android:id="@+id/etDescripcionGasto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/etMontoGasto"
+        android:layout_marginBottom="12dp"
+        android:hint="Descripción (ej. Comida, Alquiler)"
+        android:textColor="#000000"
+        android:inputType="textShortMessage|textCapSentences"
+        android:minHeight="48dp"
+        android:textSize="18sp" />
+
+    <!-- El campo de cantidad de dinero -->
+    <EditText
+        android:id="@+id/etMontoGasto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btnRegistrarGasto"
+        android:layout_marginBottom="16dp"
+        android:hint="Cantidad del gasto ($)"
+        android:textColor="#000000"
+        android:inputType="numberDecimal"
+        android:minHeight="48dp"
+        android:textSize="18sp" />
+
+    <!-- El botón se mantiene en el centro -->
+    <Button
+        android:id="@+id/btnRegistrarGasto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:backgroundTint="#000000"
+        android:textColor="#FFFFFF"
+        android:text="Registrar Gasto" />
+
+</RelativeLayout>
