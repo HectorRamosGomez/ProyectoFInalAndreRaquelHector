@@ -15,17 +15,19 @@ import com.example.proyectofinaldam.R
 class MainAplicacion : AppCompatActivity() {
 
     private lateinit var contenedorGastos: LinearLayout
+    private lateinit var txtMontoTotal: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.pagina_principal)
 
         val btnTotal = findViewById<LinearLayout>(R.id.BotonGastos)
-        val txtMontoTotal = findViewById<TextView>(R.id.txtMontoTotal)
+        txtMontoTotal = findViewById(R.id.txtMontoTotal)
         val btnIrAGastos = findViewById<Button>(R.id.botongasto)
 
         contenedorGastos = findViewById(R.id.contenedorGastos)
 
+        // Cargamos el total inicial guardado
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
         val montoGuardado = sharedPref.getString("monto_total", "00,00€")
         txtMontoTotal.text = montoGuardado
@@ -42,11 +44,48 @@ class MainAplicacion : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // 1. Primero procesamos si hay alguna resta de gasto pendiente
+        procesarRestaGasto()
+        // 2. Después actualizamos la lista visual inferior
         actualizarListaGastos()
     }
 
+    private fun procesarRestaGasto() {
+        val sharedPrefRestar = getSharedPreferences("RestarGastos", Context.MODE_PRIVATE)
+        val gastoPendiente = sharedPrefRestar.getFloat("gasto_pendiente", 0.0f)
+
+        // Si hay un gasto mayor que 0 pendiente de restar
+        if (gastoPendiente > 0) {
+            // Obtenemos el texto actual del total (ej: "150.50€" o "00,00€")
+            val textoActual = txtMontoTotal.text.toString()
+
+            // Limpiamos el texto para quedarnos solo con el número (quitamos '€' y espacios)
+            val numeroLimpio = textoActual.replace("€", "").replace(",", ".").trim()
+            val totalActualNum = numeroLimpio.toDoubleOrNull() ?: 0.0
+
+            // Realizamos la resta matemática
+            val nuevoTotalNum = totalActualNum - gastoPendiente
+            val nuevoTextoFinal = "${String.format("%.2f", nuevoTotalNum)}€"
+
+            // Actualizamos el TextView en la pantalla
+            txtMontoTotal.text = nuevoTextoFinal
+
+            // Guardamos el nuevo total de forma permanente en las preferencias del Main
+            val sharedPrefMain = getPreferences(Context.MODE_PRIVATE)
+            with(sharedPrefMain.edit()) {
+                putString("monto_total", nuevoTextoFinal)
+                apply()
+            }
+
+            // Consumimos el gasto pendiente poniéndolo a 0 para que no se vuelva a restar al rotar la pantalla
+            with(sharedPrefRestar.edit()) {
+                putFloat("gasto_pendiente", 0.0f)
+                apply()
+            }
+        }
+    }
+
     private fun actualizarListaGastos() {
-        // Limpiamos los elementos visuales previos para evitar duplicados
         contenedorGastos.removeAllViews()
 
         val sharedPref = getSharedPreferences("HistoricoGastos", Context.MODE_PRIVATE)
@@ -55,7 +94,6 @@ class MainAplicacion : AppCompatActivity() {
         if (stringGastos.isNotEmpty()) {
             val listaGastos = stringGastos.split(";")
 
-            // Creamos un TextView por cada registro guardado
             for (gasto in listaGastos) {
                 val tvGasto = TextView(this)
                 tvGasto.text = gasto

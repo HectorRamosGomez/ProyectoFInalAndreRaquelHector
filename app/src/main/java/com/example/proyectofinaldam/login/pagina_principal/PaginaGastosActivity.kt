@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.proyectofinaldam.R
@@ -26,23 +25,29 @@ class PaginaGastosActivity : AppCompatActivity() {
             if (descripcion.isEmpty() || montoStr.isEmpty()) {
                 Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
             } else {
-                // Formateamos el registro individual
+                // Formateamos el registro individual para la lista
                 val nuevoGasto = "$descripcion: ${montoStr}€"
 
-                // Guardamos en un archivo común de SharedPreferences
-                val sharedPref = getSharedPreferences("HistoricoGastos", Context.MODE_PRIVATE)
-                val listaActual = sharedPref.getString("lista_gastos", "") ?: ""
-
-                // Agregamos el nuevo registro al listado existente usando el separador ";"
+                // 1. Guardamos en el histórico de la lista
+                val sharedPrefGastos = getSharedPreferences("HistoricoGastos", Context.MODE_PRIVATE)
+                val listaActual = sharedPrefGastos.getString("lista_gastos", "") ?: ""
                 val listaActualizada = if (listaActual.isEmpty()) nuevoGasto else "$listaActual;$nuevoGasto"
 
-                with(sharedPref.edit()) {
+                with(sharedPrefGastos.edit()) {
                     putString("lista_gastos", listaActualizada)
                     apply()
                 }
 
+                // 2. NUEVO: Guardamos el valor numérico para indicarle al Main que debe restarlo
+                val montoDoble = montoStr.toDoubleOrNull() ?: 0.0
+                val sharedPrefRestar = getSharedPreferences("RestarGastos", Context.MODE_PRIVATE)
+                with(sharedPrefRestar.edit()) {
+                    putFloat("gasto_pendiente", montoDoble.toFloat())
+                    apply()
+                }
+
                 Toast.makeText(this, "Gasto guardado con éxito", Toast.LENGTH_SHORT).show()
-                finish() // Volver automáticamente atrás
+                finish()
             }
         }
     }
