@@ -144,6 +144,24 @@
                 android:backgroundTint="#000000"
                 android:textColor="#FFFFFF"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Historial de Gastos"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#000000"/>
+
+            <!-- NUEVO: Contenedor dinámico donde se irán añadiendo los gastos -->
+            <LinearLayout
+                android:id="@+id/contenedorGastos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:padding="8dp"/>
+
         </LinearLayout>
 
     </LinearLayout>
