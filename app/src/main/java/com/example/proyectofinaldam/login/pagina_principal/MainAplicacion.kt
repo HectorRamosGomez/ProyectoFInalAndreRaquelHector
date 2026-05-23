@@ -1,5 +1,6 @@
 package com.example.proyectofinaldam.login.pagina_principal
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,7 +11,10 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import com.example.proyectofinaldam.R
+import java.util.Locale
 
 class MainAplicacion : AppCompatActivity() {
 
@@ -29,7 +33,7 @@ class MainAplicacion : AppCompatActivity() {
 
         // Cargamos el total inicial guardado
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
-        val montoGuardado = sharedPref.getString("monto_total", "00,00€")
+        val montoGuardado = sharedPref.getString("monto_total", "00.00€") // Usamos punto por consistencia
         txtMontoTotal.text = montoGuardado
 
         btnTotal.setOnClickListener {
@@ -56,7 +60,7 @@ class MainAplicacion : AppCompatActivity() {
 
         // Si hay un gasto mayor que 0 pendiente de restar
         if (gastoPendiente > 0) {
-            // Obtenemos el texto actual del total (ej: "150.50€" o "00,00€")
+            // Obtenemos el texto actual del total (ej: "150.50€" o "00.00€")
             val textoActual = txtMontoTotal.text.toString()
 
             // Limpiamos el texto para quedarnos solo con el número (quitamos '€' y espacios)
@@ -65,26 +69,28 @@ class MainAplicacion : AppCompatActivity() {
 
             // Realizamos la resta matemática
             val nuevoTotalNum = totalActualNum - gastoPendiente
-            val nuevoTextoFinal = "${String.format("%.2f", nuevoTotalNum)}€"
+
+            // Usamos Locale.US para asegurar que el formato use siempre punto (.) en vez de coma (,)
+            // Esto evita errores al volver a parsear el número más adelante
+            val nuevoTextoFinal = "${String.format(Locale.US, "%.2f", nuevoTotalNum)}€"
 
             // Actualizamos el TextView en la pantalla
             txtMontoTotal.text = nuevoTextoFinal
 
             // Guardamos el nuevo total de forma permanente en las preferencias del Main
             val sharedPrefMain = getPreferences(Context.MODE_PRIVATE)
-            with(sharedPrefMain.edit()) {
+            sharedPrefMain.edit {
                 putString("monto_total", nuevoTextoFinal)
-                apply()
             }
 
-            // Consumimos el gasto pendiente poniéndolo a 0 para que no se vuelva a restar al rotar la pantalla
-            with(sharedPrefRestar.edit()) {
+            // Consumimos el gasto pendiente poniéndolo a 0
+            sharedPrefRestar.edit {
                 putFloat("gasto_pendiente", 0.0f)
-                apply()
             }
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun actualizarListaGastos() {
         contenedorGastos.removeAllViews()
 
@@ -95,19 +101,25 @@ class MainAplicacion : AppCompatActivity() {
             val listaGastos = stringGastos.split(";")
 
             for (gasto in listaGastos) {
-                val tvGasto = TextView(this)
-                tvGasto.text = gasto
-                tvGasto.textSize = 16f
-                tvGasto.setPadding(0, 8, 0, 8)
-                tvGasto.setTextColor(resources.getColor(android.R.color.black))
+                if (gasto.isBlank()) continue // Evita añadir líneas en blanco innecesarias
+
+                val tvGasto = TextView(this).apply {
+                    text = gasto
+                    textSize = 16f
+                    setPadding(0, 8, 0, 8)
+                    // CORRECCIÓN: Evitamos recursos deprecados usando ContextCompat
+                    setTextColor(ContextCompat.getColor(this@MainAplicacion, android.R.color.black))
+                }
 
                 contenedorGastos.addView(tvGasto)
             }
         } else {
-            val tvVacio = TextView(this)
-            tvVacio.text = "No hay gastos registrados todavía."
-            tvVacio.textSize = 14f
-            tvVacio.setTextColor(resources.getColor(android.R.color.darker_gray))
+            val tvVacio = TextView(this).apply {
+                text = "No hay gastos registrados todavía."
+                textSize = 14f
+                // CORRECCIÓN: ContextCompat aquí también
+                setTextColor(ContextCompat.getColor(this@MainAplicacion, android.R.color.darker_gray))
+            }
             contenedorGastos.addView(tvVacio)
         }
     }
@@ -123,15 +135,16 @@ class MainAplicacion : AppCompatActivity() {
         builder.setView(input)
 
         builder.setPositiveButton("Guardar") { _, _ ->
-            val textoIngresado = input.text.toString()
+            val textoIngresado = input.text.toString().replace(",", ".") // Aseguramos punto decimal
+            val montoNum = textoIngresado.toDoubleOrNull() ?: 0.0
+
             if (textoIngresado.isNotEmpty()) {
-                val valorFinal = "${textoIngresado}€"
+                val valorFinal = "${String.format(Locale.US, "%.2f", montoNum)}€"
                 textView.text = valorFinal
 
                 val sharedPref = getPreferences(Context.MODE_PRIVATE)
-                with(sharedPref.edit()) {
+                sharedPref.edit {
                     putString("monto_total", valorFinal)
-                    apply()
                 }
             }
         }
