@@ -4,7 +4,6 @@
         android:id="@+id/nav_modo_oscuro"
         android:icon="@android:drawable/ic_menu_compass"
         android:title="Alternar Modo Oscuro" />
-
     <item
         android:id="@+id/nav_borrar_datos"
         android:icon="@android:drawable/ic_menu_delete"

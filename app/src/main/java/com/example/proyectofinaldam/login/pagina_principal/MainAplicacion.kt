@@ -8,18 +8,25 @@ import android.text.InputType
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import com.example.proyectofinaldam.R
+import com.google.android.material.navigation.NavigationView
 import java.util.Locale
 
 class MainAplicacion : AppCompatActivity() {
 
+    private lateinit var drawerLayout: DrawerLayout
     private lateinit var contenedorGastos: LinearLayout
-    private lateinit var contenedorSuscripciones: LinearLayout
     private lateinit var txtMontoTotal: TextView
     private lateinit var txtMediaMensual: TextView
 
@@ -27,15 +34,39 @@ class MainAplicacion : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.pagina_principal)
 
+        // Inicializar Drawer Layout y NavigationView
+        drawerLayout = findViewById(R.id.drawerLayout)
+        val navigationView = findViewById<NavigationView>(R.id.navigationView)
+        val btnMenu = findViewById<ImageView>(R.id.btnMenu)
+
+        // Evento para abrir las barritas al pulsarlo
+        btnMenu.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+        // Acciones al hacer click en los elementos del panel de ajustes
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_modo_oscuro -> {
+                    cambiarModoOscuro()
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                    true
+                }
+                R.id.nav_borrar_datos -> {
+                    mostrarDialogoConfirmarBorrado()
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                    true
+                }
+                else -> false
+            }
+        }
+
         val btnTotal = findViewById<LinearLayout>(R.id.BotonGastos)
         txtMontoTotal = findViewById(R.id.txtMontoTotal)
-        txtMediaMensual = findViewById(R.id.txtMediaMensual) // ID directo y único corregido
-
+        txtMediaMensual = findViewById(R.id.txtMediaMensual)
         val btnIrAGastos = findViewById<Button>(R.id.botongasto)
-        val btnIrASuscripciones = findViewById<Button>(R.id.btnsuscripciones)
 
         contenedorGastos = findViewById(R.id.contenedorGastos)
-        contenedorSuscripciones = findViewById(R.id.contenedorSuscripciones)
 
         // Cargamos el total inicial guardado
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
@@ -51,22 +82,63 @@ class MainAplicacion : AppCompatActivity() {
             startActivity(intent)
         }
 
-        btnIrASuscripciones.setOnClickListener {
-            // Asegúrate de tener creada tu actividad para registrar suscripciones
-            val intent = Intent(this, PaginaSuscripcionesActivity::class.java)
-            startActivity(intent)
-        }
+        // SOLUCCIÓN AL RECUADRO AMARILLO: Manejo del botón atrás moderno
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
     }
 
     override fun onResume() {
         super.onResume()
-        // 1. Procesamos si hay restas pendientes
         procesarRestaGasto()
-        // 2. Actualizamos ambas vistas independientes
         actualizarListaGastos()
-        actualizarListaSuscripciones()
-        // 3. Calculamos la media global
-        calcularYActualizarMedia()
+    }
+
+    // AJUSTE: Cambiar entre Modo Claro y Oscuro
+    private fun cambiarModoOscuro() {
+        val modoActual = AppCompatDelegate.getDefaultNightMode()
+        if (modoActual == AppCompatDelegate.MODE_NIGHT_YES) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            Toast.makeText(this, "Modo Claro Activado", Toast.LENGTH_SHORT).show()
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            Toast.makeText(this, "Modo Oscuro Activado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // AJUSTE: Diálogo de confirmación para limpiar los datos
+    private fun mostrarDialogoConfirmarBorrado() {
+        AlertDialog.Builder(this)
+            .setTitle("Borrar todos los datos")
+            .setMessage("¿Estás seguro de que quieres restablecer la aplicación? Se perderán todos tus gastos guardados.")
+            .setCancelable(false)
+            .setPositiveButton("Borrar Todo") { _, _ ->
+                borrarTodaLaData()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    // Limpieza absoluta de SharedPreferences e interfaz gráfica
+    @SuppressLint("SetTextI18n")
+    private fun borrarTodaLaData() {
+        getPreferences(Context.MODE_PRIVATE).edit { clear() }
+        getSharedPreferences("HistoricoGastos", Context.MODE_PRIVATE).edit { clear() }
+        getSharedPreferences("RestarGastos", Context.MODE_PRIVATE).edit { clear() }
+
+        txtMontoTotal.text = "00.00€"
+        txtMediaMensual.text = "00.00€"
+        contenedorGastos.removeAllViews()
+
+        actualizarListaGastos()
+        Toast.makeText(this, "Todos los datos han sido eliminados", Toast.LENGTH_SHORT).show()
     }
 
     private fun procesarRestaGasto() {
@@ -94,105 +166,34 @@ class MainAplicacion : AppCompatActivity() {
         }
     }
 
-    private fun calcularYActualizarMedia() {
-        val sharedPrefGastos = getSharedPreferences("HistoricoGastos", Context.MODE_PRIVATE)
-        val stringGastos = sharedPrefGastos.getString("lista_gastos", "") ?: ""
-
-        val sharedPrefSuscri = getSharedPreferences("HistoricoSuscripciones", Context.MODE_PRIVATE)
-        val stringSuscri = sharedPrefSuscri.getString("lista_suscripciones", "") ?: ""
-
-        var sumaTotal = 0.0
-        var contadorElementos = 0
-
-        if (stringGastos.isNotEmpty()) {
-            val listaGastos = stringGastos.split(";")
-            for (gasto in listaGastos) {
-                if (gasto.isBlank()) continue
-                sumaTotal += extraerMontoNumerico(gasto)
-                contadorElementos++
-            }
-        }
-
-        if (stringSuscri.isNotEmpty()) {
-            val listaSuscri = stringSuscri.split(";")
-            for (suscripcion in listaSuscri) {
-                if (suscripcion.isBlank()) continue
-                sumaTotal += extraerMontoNumerico(suscripcion)
-                contadorElementos++
-            }
-        }
-
-        val media = if (contadorElementos > 0) sumaTotal / contadorElementos else 0.0
-        txtMediaMensual.text = "${String.format(Locale.US, "%.2f", media)}€"
-    }
-
-    private fun extraerMontoNumerico(registro: String): Double {
-        return try {
-            val partes = registro.split(":")
-            if (partes.size > 1) {
-                val precioTexto = partes[1].replace("€", "").replace(",", ".").trim()
-                precioTexto.toDoubleOrNull() ?: 0.0
-            } else {
-                0.0
-            }
-        } catch (e: Exception) {
-            0.0
-        }
-    }
-
     @SuppressLint("SetTextI18n")
     private fun actualizarListaGastos() {
         contenedorGastos.removeAllViews()
+
         val sharedPref = getSharedPreferences("HistoricoGastos", Context.MODE_PRIVATE)
         val stringGastos = sharedPref.getString("lista_gastos", "") ?: ""
 
         if (stringGastos.isNotEmpty()) {
             val listaGastos = stringGastos.split(";")
+
             for (gasto in listaGastos) {
                 if (gasto.isBlank()) continue
+
                 val tvGasto = TextView(this).apply {
                     text = gasto
-                    textSize = 14f
-                    setPadding(4, 6, 4, 6)
+                    textSize = 16f
+                    setPadding(0, 8, 0, 8)
                     setTextColor(ContextCompat.getColor(this@MainAplicacion, android.R.color.black))
                 }
                 contenedorGastos.addView(tvGasto)
             }
         } else {
             val tvVacio = TextView(this).apply {
-                text = "Sin gastos."
-                textSize = 12f
+                text = "No hay gastos registrados todavía."
+                textSize = 14f
                 setTextColor(ContextCompat.getColor(this@MainAplicacion, android.R.color.darker_gray))
             }
             contenedorGastos.addView(tvVacio)
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun actualizarListaSuscripciones() {
-        contenedorSuscripciones.removeAllViews()
-        val sharedPref = getSharedPreferences("HistoricoSuscripciones", Context.MODE_PRIVATE)
-        val stringSuscri = sharedPref.getString("lista_suscripciones", "") ?: ""
-
-        if (stringSuscri.isNotEmpty()) {
-            val listaSuscri = stringSuscri.split(";")
-            for (suscripcion in listaSuscri) {
-                if (suscripcion.isBlank()) continue
-                val tvSuscri = TextView(this).apply {
-                    text = suscripcion
-                    textSize = 14f
-                    setPadding(4, 6, 4, 6)
-                    setTextColor(ContextCompat.getColor(this@MainAplicacion, android.R.color.black))
-                }
-                contenedorSuscripciones.addView(tvSuscri)
-            }
-        } else {
-            val tvVacio = TextView(this).apply {
-                text = "Sin suscripciones."
-                textSize = 12f
-                setTextColor(ContextCompat.getColor(this@MainAplicacion, android.R.color.darker_gray))
-            }
-            contenedorSuscripciones.addView(tvVacio)
         }
     }
 

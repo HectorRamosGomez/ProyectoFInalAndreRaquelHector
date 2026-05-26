@@ -5,13 +5,12 @@
     xmlns:tools="http://tools.android.com/tools"
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:openDrawer="start">
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?android:attr/windowBackground"
+        android:background="#F8F9FA"
         android:padding="20dp">
 
         <ImageView
@@ -23,7 +22,7 @@
             app:layout_constraintBottom_toBottomOf="@id/txtTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/txtTitle"
-            app:tint="?android:attr/textColorPrimary" />
+            app:tint="#1A1A1A" />
 
         <TextView
             android:id="@+id/txtTitle"
@@ -31,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="OnlySave"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textColor="#1A1A1A"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -53,7 +52,7 @@
             android:layout_width="0dp"
             android:layout_height="100dp"
             android:layout_marginTop="28dp"
-            app:cardBackgroundColor="?android:attr/colorBackground"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="2dp"
             app:layout_constraintEnd_toStartOf="@id/cardMedia"
@@ -84,8 +83,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="00.00€"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:text="00,00€"
+                    android:textColor="#1A1A1A"
                     android:textSize="24sp"
                     android:textStyle="bold"/>
             </LinearLayout>
@@ -95,7 +94,7 @@
             android:id="@+id/cardMedia"
             android:layout_width="0dp"
             android:layout_height="100dp"
-            app:cardBackgroundColor="?android:attr/colorBackground"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -112,7 +111,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Medias globales"
+                    android:text="Medias mensuales"
                     android:textColor="#757575"
                     android:textSize="14sp"/>
 
@@ -121,8 +120,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="00.00€"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:text="00,00€"
+                    android:textColor="#1A1A1A"
                     android:textSize="24sp"
                     android:textStyle="bold"/>
             </LinearLayout>
@@ -170,74 +169,35 @@
                 app:iconTint="#000000" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/layoutTitulosHistorial"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/lblHistorial"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:text="Historial de Gastos"
+            android:textColor="#1A1A1A"
+            android:textSize="18sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layoutButtons">
+            app:layout_constraintTop_toBottomOf="@id/layoutButtons"/>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Historial Gastos"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="16dp"
-                android:text="Suscripciones"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="12dp"
-            android:orientation="horizontal"
+            android:fillViewport="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layoutTitulosHistorial">
+            app:layout_constraintTop_toBottomOf="@id/lblHistorial">
 
-            <androidx.core.widget.NestedScrollView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:fillViewport="true">
-
-                <LinearLayout
-                    android:id="@+id/contenedorGastos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </androidx.core.widget.NestedScrollView>
-
-            <androidx.core.widget.NestedScrollView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:fillViewport="true">
-
-                <LinearLayout
-                    android:id="@+id/contenedorSuscripciones"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </androidx.core.widget.NestedScrollView>
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/contenedorGastos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:listitem="@android:layout/simple_list_item_1"/>
+        </androidx.core.widget.NestedScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -245,8 +205,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="?android:attr/windowBackground"
-        app:menu="@menu/menu_ajustes"
-        app:headerLayout="@layout/nav_header" />
+        android:background="#FFFFFF"
+        app:menu="@menu/menu_ajustes" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
