@@ -23,9 +23,8 @@
 
         <activity android:name=".login.MainActivity2Idiomas" android:exported="false" />
         <activity android:name=".login.pagina_principal.MainAplicacion" android:exported="false" />
-        <activity
-            android:name=".login.pagina_principal.PaginaGastosActivity"
-            android:exported="false" />
+        <activity android:name=".login.pagina_principal.PaginaGastosActivity" android:exported="false" />
+        <activity android:name=".login.pagina_principal.PaginaSuscripcionesActivity" android:exported="false" />
     </application>
 
 </manifest>
