@@ -74,16 +74,13 @@ class MainAplicacion : AppCompatActivity() {
             // Esto evita errores al volver a parsear el número más adelante
             val nuevoTextoFinal = "${String.format(Locale.US, "%.2f", nuevoTotalNum)}€"
 
-            // Actualizamos el TextView en la pantalla
             txtMontoTotal.text = nuevoTextoFinal
 
-            // Guardamos el nuevo total de forma permanente en las preferencias del Main
             val sharedPrefMain = getPreferences(Context.MODE_PRIVATE)
             sharedPrefMain.edit {
                 putString("monto_total", nuevoTextoFinal)
             }
 
-            // Consumimos el gasto pendiente poniéndolo a 0
             sharedPrefRestar.edit {
                 putFloat("gasto_pendiente", 0.0f)
             }
